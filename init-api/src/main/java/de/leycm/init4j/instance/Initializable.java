@@ -219,6 +219,7 @@ public interface Initializable {
      * <p>Override to perform setup logic that should run at install time.
      * The default implementation does nothing.</p>
      */
+    @SuppressWarnings("EmptyMethod") // does not require implementation
     default void onInstall() {}
 
     /**
@@ -227,5 +228,6 @@ public interface Initializable {
      * <p>Override to perform teardown or cleanup logic that should run at uninstall time.
      * The default implementation does nothing.</p>
      */
+    @SuppressWarnings("EmptyMethod") // does not require implementation
     default void onUninstall() {}
 }
