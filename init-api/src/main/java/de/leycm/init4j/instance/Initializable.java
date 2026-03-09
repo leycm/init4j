@@ -16,35 +16,75 @@ import java.util.function.Function;
 
 public interface Initializable {
 
-    static <T extends Initializable> @NonNull T getInstance(final @NonNull Class<T> clazz)
-            throws NullPointerException {
-        return InitializableRegistry.getInstance(clazz);
+    String DEFAULT_NAMESPACE = "de.leycm.init4j";
+
+    static <T extends Initializable> @NonNull T getInstance(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        return InitializableRegistry.getInstance(namespace, clazz);
     }
 
-    static <T extends Initializable> @NonNull T computeIfAbsent(final @NonNull Class<T> clazz,
-                                                                final @NonNull Function<Class<?>, T> mappingFunction
+    static <T extends Initializable> @NonNull T computeIfAbsent(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz,
+            final @NonNull Function<Class<?>, T> mappingFunction
     ) throws NullPointerException {
-
-        return InitializableRegistry.computeIfAbsent(clazz, mappingFunction);
+        return InitializableRegistry.computeIfAbsent(namespace, clazz, mappingFunction);
     }
 
-    static boolean hasInstance(final @NonNull Class<?> clazz
+    static boolean hasInstance(
+            final @NonNull String namespace,
+            final @NonNull Class<?> clazz
     ) throws NullPointerException {
-
-        return InitializableRegistry.hasInstance(clazz);
+        return InitializableRegistry.hasInstance(namespace, clazz);
     }
 
-    static <T extends Initializable> void register(final @NonNull T instance,
-                                                   final @NonNull Class<T> clazz
+    static <T extends Initializable> void register(
+            final @NonNull String namespace,
+            final @NonNull T instance,
+            final @NonNull Class<T> clazz
     ) throws NullPointerException {
-
-        InitializableRegistry.register(instance, clazz);
+        InitializableRegistry.register(namespace, instance, clazz);
     }
 
-    static <T extends Initializable> void unregister(final @NonNull Class<T> clazz
+    static <T extends Initializable> void unregister(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
     ) throws NullPointerException {
+        InitializableRegistry.unregister(namespace, clazz);
+    }
 
-        InitializableRegistry.unregister(clazz);
+    static <T extends Initializable> @NonNull T getInstance(
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        return InitializableRegistry.getInstance(DEFAULT_NAMESPACE, clazz);
+    }
+
+    static <T extends Initializable> @NonNull T computeIfAbsent(
+            final @NonNull Class<T> clazz,
+            final @NonNull Function<Class<?>, T> mappingFunction
+    ) throws NullPointerException {
+        return InitializableRegistry.computeIfAbsent(DEFAULT_NAMESPACE, clazz, mappingFunction);
+    }
+
+    static boolean hasInstance(
+            final @NonNull Class<?> clazz
+    ) throws NullPointerException {
+        return InitializableRegistry.hasInstance(DEFAULT_NAMESPACE, clazz);
+    }
+
+    static <T extends Initializable> void register(
+            final @NonNull T instance,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        InitializableRegistry.register(DEFAULT_NAMESPACE, instance, clazz);
+    }
+
+    static <T extends Initializable> void unregister(
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        InitializableRegistry.unregister(DEFAULT_NAMESPACE, clazz);
     }
 
     default void onInstall() {}

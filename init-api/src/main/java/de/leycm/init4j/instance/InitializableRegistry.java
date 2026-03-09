@@ -18,57 +18,79 @@ import java.util.function.Function;
 
 public class InitializableRegistry {
 
-    private static final Map<Class<?>, Initializable> REGISTRY = new ConcurrentHashMap<>();
+    // namespace -> (class -> instance)
+    private static final Map<String, Map<Class<?>, Initializable>> REGISTRY = new ConcurrentHashMap<>();
+
+    private static Map<Class<?>, Initializable> getNamespace(final @NonNull String namespace) {
+        return REGISTRY.computeIfAbsent(namespace, ns -> new ConcurrentHashMap<>());
+    }
 
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Initializable> @NonNull T getInstance(final @NonNull Class<T> clazz)
-            throws NullPointerException, ClassCastException {
-        Initializable instance = REGISTRY.get(clazz);
+    protected static <T extends Initializable> @NonNull T getInstance(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException, ClassCastException {
+        Initializable instance = getNamespace(namespace).get(clazz);
 
         if (instance == null)
-            throw new NullPointerException("No instance registered for " + clazz.getSimpleName());
+            throw new NullPointerException(
+                    "No instance registered for " + clazz.getSimpleName() + " in namespace '" + namespace + "'");
 
         if (!clazz.isInstance(instance))
-            throw new ClassCastException("Registered instance is not of type " + clazz.getSimpleName());
+            throw new ClassCastException(
+                    "Registered instance is not of type " + clazz.getSimpleName());
 
         return (T) instance;
     }
 
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Initializable> @NonNull T computeIfAbsent(final @NonNull Class<T> clazz,
-                                                                          final @NonNull Function<Class<?>, T> mappingFunction
+    protected static <T extends Initializable> @NonNull T computeIfAbsent(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz,
+            final @NonNull Function<Class<?>, T> mappingFunction
     ) throws NullPointerException, ClassCastException {
-        Initializable instance = REGISTRY.computeIfAbsent(clazz, mappingFunction);
+        Initializable instance = getNamespace(namespace).computeIfAbsent(clazz, mappingFunction);
 
         if (!clazz.isInstance(instance))
-            throw new ClassCastException("Registered instance is not of type " + clazz.getSimpleName());
+            throw new ClassCastException(
+                    "Registered instance is not of type " + clazz.getSimpleName());
 
         return (T) instance;
     }
 
-    protected static boolean hasInstance(final @NonNull Class<?> clazz)
-            throws NullPointerException {
-        return REGISTRY.containsKey(clazz);
+    protected static boolean hasInstance(
+            final @NonNull String namespace,
+            final @NonNull Class<?> clazz
+    ) throws NullPointerException {
+        return getNamespace(namespace).containsKey(clazz);
     }
 
-    protected static <T extends Initializable> void register(final @NonNull T instance,
-                                                             final @NonNull Class<T> clazz
+    protected static <T extends Initializable> void register(
+            final @NonNull String namespace,
+            final @NonNull T instance,
+            final @NonNull Class<T> clazz
     ) throws NullPointerException {
+        Map<Class<?>, Initializable> ns = getNamespace(namespace);
 
-        if (REGISTRY.containsKey(clazz))
-            throw new NullPointerException("An instance of " + clazz.getSimpleName() + " is already registered");
+        if (ns.containsKey(clazz))
+            throw new NullPointerException(
+                    "An instance of " + clazz.getSimpleName() + " is already registered in namespace '" + namespace + "'");
 
         instance.onInstall();
-        REGISTRY.put(clazz, instance);
+        ns.put(clazz, instance);
     }
 
-    protected static <T extends Initializable> void unregister(final @NonNull Class<T> clazz)
-            throws NullPointerException {
+    protected static <T extends Initializable> void unregister(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        Map<Class<?>, Initializable> ns = getNamespace(namespace);
 
-        if (!REGISTRY.containsKey(clazz))
-            throw new NullPointerException("There is no instance of " + clazz.getSimpleName());
+        if (!ns.containsKey(clazz))
+            throw new NullPointerException(
+                    "There is no instance of " + clazz.getSimpleName() + " in namespace '" + namespace + "'");
 
-        REGISTRY.get(clazz).onUninstall();
-        REGISTRY.remove(clazz);
+        ns.get(clazz).onUninstall();
+        ns.remove(clazz);
     }
 }
