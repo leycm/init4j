@@ -38,6 +38,17 @@ import java.util.function.Function;
  */
 public class InitializableRegistry {
 
+    /**
+     * Private constructor to prevent instantiation.
+     *
+     * <p>This class is designed to be used statically and should not be instantiated.
+     * Attempting to create an instance will result in an {@link UnsupportedOperationException}.</p>
+     * @throws UnsupportedOperationException always
+     */
+    private InitializableRegistry() {
+        throw new UnsupportedOperationException("InitializableRegistry is a static only class and cannot be instantiated");
+    }
+
     // namespace -> (class -> instance)
     @ApiStatus.Internal
     private static final Map<String, Map<Class<?>, Initializable>> REGISTRY = new ConcurrentHashMap<>();
