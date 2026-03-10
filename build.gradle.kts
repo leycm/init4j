@@ -181,36 +181,3 @@ subprojects {
         }
     }
 }
-
-// Custom Build Task
-tasks.register("collect") {
-
-    group = "build"
-    description = "Builds all platform variants and copies them into build/out"
-
-    dependsOn(subprojects.mapNotNull { it.tasks.findByName("build") })
-
-    doLast {
-
-        val outDir = rootProject.file("out").apply { mkdirs() }
-
-        subprojects
-            .filter { it.name != "api" }
-            .forEach { project ->
-
-                val jar = project.layout.buildDirectory
-                    .file("libs/${rootProject.name}-${project.name}-${project.version}.jar")
-                    .get()
-                    .asFile
-
-                if (jar.exists()) {
-
-                    jar.copyTo(outDir.resolve(jar.name), overwrite = true)
-
-                    println("> Copied ${jar.name} -> build/out/")
-                }
-            }
-
-        println("[*] All plugin builds finished and moved to build/out/")
-    }
-}
