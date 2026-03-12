@@ -51,12 +51,10 @@ public class ImmutableRegistry<T> implements Registry<T> {
      * @throws IllegalStateException when no value is registered for {@code id}
      */
     @Override
-    public void unregister(@NonNull Identifier id) {
-        if (!store.containsKey(id))
-            throw new IllegalStateException(
-                    "No entry registered for identifier '" + id + "'");
-
+    public T unregister(@NonNull Identifier id) {
+        T value = get(id);
         store.remove(id);
+        return value;
     }
 
     /**

@@ -46,12 +46,10 @@ public class MutableRegistry<T> implements Registry<T> {
      * @throws IllegalStateException when no value is registered for {@code id}
      */
     @Override
-    public void unregister(@NonNull Identifier id) {
-        if (!store.containsKey(id))
-            throw new IllegalStateException(
-                    "No entry registered for identifier '" + id + "'");
-
+    public T unregister(@NonNull Identifier id) {
+        T value = get(id);
         store.remove(id);
+        return value;
     }
 
     /**
@@ -63,8 +61,7 @@ public class MutableRegistry<T> implements Registry<T> {
     public @NonNull T get(@NonNull Identifier id) {
         T value = store.get(id);
         if (value == null)
-            throw new NullPointerException(
-                    "No entry registered for identifier '" + id + "'");
+            throw new NullPointerException("No entry registered for identifier \"" + id + "\"");
         return value;
     }
 
@@ -95,8 +92,7 @@ public class MutableRegistry<T> implements Registry<T> {
     ) {
         T value = store.computeIfAbsent(id, mappingFunction);
         if (value == null)
-            throw new NullPointerException(
-                    "Mapping function returned null for identifier '" + id + "'");
+            throw new NullPointerException("Mapping function returned null for identifier '" + id + "'");
         return value;
     }
 
@@ -108,7 +104,8 @@ public class MutableRegistry<T> implements Registry<T> {
      * {@code id} is present.</p>
      */
     @Override
-    public @NonNull T getOrDefault(@NonNull Identifier id, @NonNull Supplier<T> supplier) {
+    public @NonNull T getOrDefault(@NonNull Identifier id,
+                                   @NonNull Supplier<T> supplier) {
         return store.getOrDefault(id, supplier.get());
     }
 

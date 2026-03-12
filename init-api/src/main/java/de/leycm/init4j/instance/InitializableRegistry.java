@@ -10,11 +10,11 @@
  */
 package de.leycm.init4j.instance;
 
+import de.leycm.init4j.identifier.Identifier;
+import de.leycm.init4j.registry.ImmutableRegistry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -29,8 +29,8 @@ import java.util.function.Function;
  * allowing multiple implementations of the same type within different contexts.</p>
  *
  * <p>Thread Safety: This class is thread-safe. All registry operations are backed
- * by {@link ConcurrentHashMap}, ensuring safe concurrent access without external
- * synchronization.</p>
+ * by {@link ImmutableRegistry}, which uses a {@link java.util.concurrent.ConcurrentHashMap}
+ * internally, ensuring safe concurrent access without external synchronization.</p>
  *
  * @since 1.0.0
  * @see Initializable
@@ -49,27 +49,35 @@ public class InitializableRegistry {
         throw new UnsupportedOperationException("InitializableRegistry is a static only class and cannot be instantiated");
     }
 
-    // namespace -> (class -> instance)
     @ApiStatus.Internal
-    private static final Map<String, Map<Class<?>, Initializable>> REGISTRY = new ConcurrentHashMap<>();
+    private static final ImmutableRegistry<Initializable> REGISTRY = new ImmutableRegistry<>();
 
     /**
-     * Returns the inner class-to-instance map for the given namespace, creating it if absent.
+     * Builds a composite {@link Identifier} from a namespace string and a class type.
+     *
+     * <p>The namespace is sanitized via {@link Identifier#sanitizeNamespace(String)} and
+     * the class simple name is used as the key, also sanitized via
+     * {@link Identifier#sanitizeKey(String)}.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
-     * @return the namespace map; never {@code null}
-     * @throws NullPointerException when {@code namespace} is {@code null}
+     * @param clazz the class type; must not be {@code null}
+     * @return a well-formed {@link Identifier}; never {@code null}
      */
     @ApiStatus.Internal
-    private static Map<Class<?>, Initializable> getNamespace(final @NonNull String namespace) {
-        return REGISTRY.computeIfAbsent(namespace, ns -> new ConcurrentHashMap<>());
+    private static @NonNull Identifier toIdentifier(
+            final @NonNull String namespace,
+            final @NonNull Class<?> clazz
+    ) {
+        return Identifier.of(
+                Identifier.sanitizeNamespace(namespace),
+                Identifier.sanitizeKey(clazz.getName())
+        );
     }
 
     /**
      * Retrieves a registered instance by namespace and class type.
      *
-     * <p>Validates that the stored instance is assignment-compatible with {@code clazz}
-     * before casting. The {@code @SuppressWarnings("unchecked")} is safe because
+     * <p>The {@code @SuppressWarnings("unchecked")} is safe because
      * {@link Class#isInstance(Object)} is checked prior to the cast.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
@@ -86,11 +94,8 @@ public class InitializableRegistry {
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
     ) throws NullPointerException, ClassCastException {
-        Initializable instance = getNamespace(namespace).get(clazz);
-
-        if (instance == null)
-            throw new NullPointerException(
-                    "No instance registered for " + clazz.getSimpleName() + " in namespace '" + namespace + "'");
+        Identifier id = toIdentifier(namespace, clazz);
+        Initializable instance = REGISTRY.get(id);
 
         if (!clazz.isInstance(instance))
             throw new ClassCastException(
@@ -102,8 +107,7 @@ public class InitializableRegistry {
     /**
      * Returns the existing instance for the given namespace and class type, or computes and registers one if absent.
      *
-     * <p>Delegates to {@link Map#computeIfAbsent(Object, Function)} on the namespace map.
-     * The {@code @SuppressWarnings("unchecked")} is safe because {@link Class#isInstance(Object)}
+     * <p>The {@code @SuppressWarnings("unchecked")} is safe because {@link Class#isInstance(Object)}
      * is checked prior to the cast.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
@@ -111,7 +115,6 @@ public class InitializableRegistry {
      * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
      * @param <T> the type of the {@link Initializable} instance
      * @return the existing or newly computed instance; never {@code null}
-     * @throws ClassCastException when the resulting instance is not assignment-compatible with {@code clazz}
      * @throws NullPointerException when {@code namespace}, {@code clazz}, or {@code mappingFunction} is {@code null},
      *                              or when the mapping function returns {@code null}
      * @throws ClassCastException when the resulting instance is not assignment-compatible with {@code clazz}
@@ -123,7 +126,8 @@ public class InitializableRegistry {
             final @NonNull Class<T> clazz,
             final @NonNull Function<Class<?>, T> mappingFunction
     ) throws NullPointerException, ClassCastException {
-        Initializable instance = getNamespace(namespace).computeIfAbsent(clazz, mappingFunction);
+        Identifier id = toIdentifier(namespace, clazz);
+        Initializable instance = REGISTRY.computeIfAbsent(id, ignored -> mappingFunction.apply(clazz));
 
         if (!clazz.isInstance(instance))
             throw new ClassCastException(
@@ -145,7 +149,7 @@ public class InitializableRegistry {
             final @NonNull String namespace,
             final @NonNull Class<?> clazz
     ) throws NullPointerException {
-        return getNamespace(namespace).containsKey(clazz);
+        return REGISTRY.has(toIdentifier(namespace, clazz));
     }
 
     /**
@@ -158,23 +162,17 @@ public class InitializableRegistry {
      * @param instance the instance to register; must not be {@code null}
      * @param clazz the class type to associate with the instance; must not be {@code null}
      * @param <T> the type of the {@link Initializable} instance
-     * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null},
-     *                              or when an instance of {@code clazz} is already registered in the namespace
+     * @throws IllegalStateException when an instance of {@code clazz} is already registered in the namespace
+     * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
     protected static <T extends Initializable> void register(
             final @NonNull String namespace,
             final @NonNull T instance,
             final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        Map<Class<?>, Initializable> ns = getNamespace(namespace);
-
-        if (ns.containsKey(clazz))
-            throw new NullPointerException(
-                    "An instance of " + clazz.getSimpleName() + " is already registered in namespace '" + namespace + "'");
-
+    ) throws NullPointerException, IllegalStateException {
         instance.onInstall();
-        ns.put(clazz, instance);
+        REGISTRY.register(toIdentifier(namespace, clazz), instance);
     }
 
     /**
@@ -186,21 +184,15 @@ public class InitializableRegistry {
      * @param namespace the target namespace; must not be {@code null}
      * @param clazz the class type of the instance to remove; must not be {@code null}
      * @param <T> the type of the {@link Initializable} instance
-     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null},
-     *                              or when no instance of {@code clazz} is registered in the namespace
+     * @throws IllegalStateException when no instance of {@code clazz} is registered in the namespace
+     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
     protected static <T extends Initializable> void unregister(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        Map<Class<?>, Initializable> ns = getNamespace(namespace);
-
-        if (!ns.containsKey(clazz))
-            throw new NullPointerException(
-                    "There is no instance of " + clazz.getSimpleName() + " in namespace '" + namespace + "'");
-
-        ns.get(clazz).onUninstall();
-        ns.remove(clazz);
+    ) throws NullPointerException, IllegalStateException {
+        Identifier id = toIdentifier(namespace, clazz);
+        REGISTRY.unregister(id).onUninstall();;
     }
 }
