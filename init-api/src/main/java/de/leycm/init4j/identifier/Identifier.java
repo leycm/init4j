@@ -65,7 +65,7 @@ public final class Identifier {
      * @param namespace the namespace to validate; must not be {@code null}
      * @throws IllegalArgumentException when the namespace is blank or contains invalid characters
      */
-    public static void validateNamespace(@NonNull String namespace) {
+    public static void validateNamespace(final @NonNull String namespace) {
         if (namespace.isBlank()) {
             throw new IllegalArgumentException("namespace is blank");
         }
@@ -84,7 +84,7 @@ public final class Identifier {
      * @param key the key to validate; must not be {@code null}
      * @throws IllegalArgumentException when the key is blank or contains invalid characters
      */
-    public static void validateKey(@NonNull String key) {
+    public static void validateKey(final @NonNull String key) {
         if (key.isBlank()) {
             throw new IllegalArgumentException("key can not be blank");
         }
@@ -102,7 +102,7 @@ public final class Identifier {
      * @param namespace the namespace to check; may be {@code null}
      * @return {@code true} if the namespace is valid, {@code false} otherwise
      */
-    public static boolean isValidNamespace(@Nullable String namespace) {
+    public static boolean isValidNamespace(final @Nullable String namespace) {
         if (namespace == null) return false;
         try {
             validateNamespace(namespace);
@@ -121,7 +121,7 @@ public final class Identifier {
      * @param key the key to check; may be {@code null}
      * @return {@code true} if the key is valid, {@code false} otherwise
      */
-    public static boolean isValidKey(@Nullable String key) {
+    public static boolean isValidKey(final @Nullable String key) {
         if (key == null) return false;
         try {
             validateKey(key);
@@ -141,7 +141,7 @@ public final class Identifier {
      * @param namespace the namespace string to sanitize; must not be {@code null}
      * @return the sanitized namespace; never {@code null}
      */
-    public static @NonNull String sanitizeNamespace(@NonNull String namespace) {
+    public static @NonNull String sanitizeNamespace(final @NonNull String namespace) {
         return NAMESPACE_SANITIZE.matcher(namespace.toLowerCase()).replaceAll("_");
     }
 
@@ -155,7 +155,7 @@ public final class Identifier {
      * @param key the key string to sanitize; must not be {@code null}
      * @return the sanitized key; never {@code null}
      */
-    public static @NonNull String sanitizeKey(@NonNull String key) {
+    public static @NonNull String sanitizeKey(final @NonNull String key) {
         return KEY_SANITIZE.matcher(key).replaceAll("_");
     }
 
@@ -167,7 +167,8 @@ public final class Identifier {
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace or key is blank or contains invalid characters
      */
-    public static @NonNull Identifier of(@NonNull String namespace, @NonNull String key) {
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull String key) {
         return new Identifier(namespace, key);
     }
 
@@ -179,7 +180,8 @@ public final class Identifier {
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace is blank or the derived key contains invalid characters
      */
-    public static @NonNull Identifier of(@NonNull String namespace, @NonNull Class<?> key) {
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull Class<?> key) {
         return new Identifier(namespace, key.toString());
     }
 
@@ -191,7 +193,8 @@ public final class Identifier {
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace is blank or contains invalid characters
      */
-    public static @NonNull Identifier of(@NonNull String namespace, @NonNull UUID key) {
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull UUID key) {
         return new Identifier(namespace, key.toString());
     }
 
@@ -203,11 +206,12 @@ public final class Identifier {
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace is blank or the derived key contains invalid characters
      */
-    public static @NonNull Identifier of(@NonNull String namespace, @NonNull Object key) {
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull Object key) {
         return new Identifier(namespace, String.valueOf(key));
     }
 
-    private Identifier(@NonNull String namespace, @NonNull String key) {
+    private Identifier(final @NonNull String namespace, final @NonNull String key) {
         validateKey(key);
         validateNamespace(namespace);
         this.namespace = namespace;
