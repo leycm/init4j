@@ -11,10 +11,14 @@
 package de.leycm.init4j.instance;
 
 import de.leycm.init4j.identifier.Identifier;
-import de.leycm.init4j.registry.ImmutableRegistry;
+import de.leycm.init4j.registries.NoOverwriteRegistry;
+import de.leycm.init4j.registries.Registries;
+import de.leycm.init4j.registry.ConcurrentHashRegistry;
+import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collections;
 import java.util.function.Function;
 
 /**
@@ -29,7 +33,7 @@ import java.util.function.Function;
  * allowing multiple implementations of the same type within different contexts.</p>
  *
  * <p>Thread Safety: This class is thread-safe. All registry operations are backed
- * by {@link ImmutableRegistry}, which uses a {@link java.util.concurrent.ConcurrentHashMap}
+ * by {@link NoOverwriteRegistry}, which uses a {@link java.util.concurrent.ConcurrentHashMap}
  * internally, ensuring safe concurrent access without external synchronization.</p>
  *
  * @since 1.0.0
@@ -50,7 +54,7 @@ public class InitializableRegistry {
     }
 
     @ApiStatus.Internal
-    private static final ImmutableRegistry<Initializable> REGISTRY = new ImmutableRegistry<>();
+    private static final Registry<Initializable> REGISTRY = Registries.noOverwriteRegistry(new ConcurrentHashRegistry<>());
 
     /**
      * Builds a composite {@link Identifier} from a namespace string and a class type.
