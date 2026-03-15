@@ -33,6 +33,7 @@ public interface Registry<T> extends Iterable<T> {
      * Removes the value associated with the given identifier.
      *
      * @param id the identifier to remove; must not be {@code null}
+     * @return the removed value, or {@code null} if no entry was registered for {@code id}
      * @throws NullPointerException when {@code id} is {@code null}
      */
     T unregister(@NonNull Identifier id);

@@ -126,7 +126,7 @@ public abstract class MapRegistry<T> implements Registry<T> {
      * Returns an unmodifiable iterator over all registered values.
      *
      * <p>The iteration order depends on the backing map supplied by
-     * {@link #createStore()}.</p>
+     * {@link MapRegistry#MapRegistry(Map)}.</p>
      *
      * @return an iterator over the values; never {@code null}
      */
