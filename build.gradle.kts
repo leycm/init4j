@@ -1,7 +1,6 @@
 import java.util.Properties
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.plugins.signing.SigningExtension
 
 plugins {
     java
