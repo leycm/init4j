@@ -38,7 +38,8 @@ dependencyResolutionManagement {
 
 // Project Includes
 rootProject.name = getGradleProperty("artifact") ?: "null"
+var prefix = (getGradleProperty("prefix") ?: "sub") + "-"
 
 include("api")
 
-project(":api").projectDir = file("init-api")
+project(":api").projectDir = file("${prefix}api")

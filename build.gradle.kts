@@ -142,42 +142,25 @@ subprojects {
         }
 
         repositories {
-
             maven {
-
-                name = "OSSRH"
-
-                val releases =
-                    "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                val snapshots =
-                    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-
-                url = uri(
-                    if (version.toString().endsWith("SNAPSHOT"))
-                        snapshots
-                    else
-                        releases
-                )
-
-                credentials {
-
-                    username = env("OSSRH_USERNAME")
-                    password = env("OSSRH_PASSWORD")
-                }
+                name = "leycm-repo"
+                val repoDir = rootProject.projectDir.parentFile.resolve("repository")
+                url = uri(repoDir)
             }
         }
     }
 
-    configure<SigningExtension> {
+    tasks.register<Exec>("updateRepo") {
+        println("Running push script in repository directory...")
+        val repoDir = rootProject.projectDir.parentFile.resolve("repository")
+        val script = repoDir.resolve("publish.sh")
 
-        val signingKey = env("SIGNING_KEY")
-        val signingPassword = env("SIGNING_PASSWORD")
-
-        if (signingKey != null && signingPassword != null) {
-
-            useInMemoryPgpKeys(signingKey, signingPassword)
-
-            sign(extensions.getByType<PublishingExtension>().publications)
-        }
+        workingDir = repoDir
+        commandLine("sh", script.absolutePath)
     }
+
+    tasks.named("publish") {
+        finalizedBy("updateRepo")
+    }
+
 }
