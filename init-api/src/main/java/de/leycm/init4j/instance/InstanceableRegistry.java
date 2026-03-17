@@ -18,16 +18,15 @@ import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
 import java.util.function.Function;
 
 /**
- * A registry for {@link Initializable} instances, organized by namespace and class.
+ * A registry for {@link Instanceable} instances, organized by namespace and class.
  *
  * <p>This class provides methods to register, retrieve, and manage instances of
- * {@link Initializable} implementations. Each instance is associated with a specific
+ * {@link Instanceable} implementations. Each instance is associated with a specific
  * namespace and class type, allowing for flexible and modular management of
- * initializable components.</p>
+ * instanceable components.</p>
  *
  * <p>Namespaces group related instances together, preventing naming conflicts and
  * allowing multiple implementations of the same type within different contexts.</p>
@@ -37,10 +36,10 @@ import java.util.function.Function;
  * internally, ensuring safe concurrent access without external synchronization.</p>
  *
  * @since 1.0.0
- * @see Initializable
+ * @see Instanceable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public class InitializableRegistry {
+public class InstanceableRegistry {
 
     /**
      * Private constructor to prevent instantiation.
@@ -49,12 +48,12 @@ public class InitializableRegistry {
      * Attempting to create an instance will result in an {@link UnsupportedOperationException}.</p>
      * @throws UnsupportedOperationException always
      */
-    private InitializableRegistry() {
-        throw new UnsupportedOperationException("InitializableRegistry is a static only class and cannot be instantiated");
+    private InstanceableRegistry() {
+        throw new UnsupportedOperationException("InstanceableRegistry is a static only class and cannot be instantiated");
     }
 
     @ApiStatus.Internal
-    private static final Registry<Initializable> REGISTRY = Registries.noOverwriteRegistry(new ConcurrentHashRegistry<>());
+    private static final Registry<Instanceable> REGISTRY = Registries.noOverwriteRegistry(new ConcurrentHashRegistry<>());
 
     /**
      * Builds a composite {@link Identifier} from a namespace string and a class type.
@@ -86,7 +85,7 @@ public class InitializableRegistry {
      *
      * @param namespace the target namespace; must not be {@code null}
      * @param clazz the class type of the instance to retrieve; must not be {@code null}
-     * @param <T> the type of the {@link Initializable} instance
+     * @param <T> the type of the {@link Instanceable} instance
      * @return the registered instance; never {@code null}
      * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null},
      *                              or when no instance is registered for {@code clazz} in the namespace
@@ -94,12 +93,12 @@ public class InitializableRegistry {
      */
     @ApiStatus.Internal
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Initializable> @NonNull T getInstance(
+    protected static <T extends Instanceable> @NonNull T getInstance(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
     ) throws NullPointerException, ClassCastException {
         Identifier id = toIdentifier(namespace, clazz);
-        Initializable instance = REGISTRY.get(id);
+        Instanceable instance = REGISTRY.get(id);
 
         if (!clazz.isInstance(instance))
             throw new ClassCastException(
@@ -117,7 +116,7 @@ public class InitializableRegistry {
      * @param namespace the target namespace; must not be {@code null}
      * @param clazz the class type of the instance; must not be {@code null}
      * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
-     * @param <T> the type of the {@link Initializable} instance
+     * @param <T> the type of the {@link Instanceable} instance
      * @return the existing or newly computed instance; never {@code null}
      * @throws NullPointerException when {@code namespace}, {@code clazz}, or {@code mappingFunction} is {@code null},
      *                              or when the mapping function returns {@code null}
@@ -125,13 +124,13 @@ public class InitializableRegistry {
      */
     @ApiStatus.Internal
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Initializable> @NonNull T computeIfAbsent(
+    protected static <T extends Instanceable> @NonNull T computeIfAbsent(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz,
             final @NonNull Function<Class<?>, T> mappingFunction
     ) throws NullPointerException, ClassCastException {
         Identifier id = toIdentifier(namespace, clazz);
-        Initializable instance = REGISTRY.computeIfAbsent(id, ignored -> mappingFunction.apply(clazz));
+        Instanceable instance = REGISTRY.computeIfAbsent(id, ignored -> mappingFunction.apply(clazz));
 
         if (!clazz.isInstance(instance))
             throw new ClassCastException(
@@ -159,18 +158,18 @@ public class InitializableRegistry {
     /**
      * Registers an instance under the given namespace and class type.
      *
-     * <p>Invokes {@link Initializable#onInstall()} on the instance before storing it.
+     * <p>Invokes {@link Instanceable#onInstall()} on the instance before storing it.
      * Throws if an instance of the same class type is already registered in the namespace.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
      * @param instance the instance to register; must not be {@code null}
      * @param clazz the class type to associate with the instance; must not be {@code null}
-     * @param <T> the type of the {@link Initializable} instance
+     * @param <T> the type of the {@link Instanceable} instance
      * @throws IllegalStateException when an instance of {@code clazz} is already registered in the namespace
      * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
-    protected static <T extends Initializable> void register(
+    protected static <T extends Instanceable> void register(
             final @NonNull String namespace,
             final @NonNull T instance,
             final @NonNull Class<T> clazz
@@ -182,21 +181,21 @@ public class InitializableRegistry {
     /**
      * Removes the registered instance for the given namespace and class type.
      *
-     * <p>Invokes {@link Initializable#onUninstall()} on the instance before removing it.
+     * <p>Invokes {@link Instanceable#onUninstall()} on the instance before removing it.
      * Throws if no instance of the given class type is currently registered in the namespace.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
      * @param clazz the class type of the instance to remove; must not be {@code null}
-     * @param <T> the type of the {@link Initializable} instance
+     * @param <T> the type of the {@link Instanceable} instance
      * @throws IllegalStateException when no instance of {@code clazz} is registered in the namespace
      * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
-    protected static <T extends Initializable> void unregister(
+    protected static <T extends Instanceable> void unregister(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
     ) throws NullPointerException, IllegalStateException {
         Identifier id = toIdentifier(namespace, clazz);
-        REGISTRY.unregister(id).onUninstall();;
+        REGISTRY.unregister(id).onUninstall();
     }
 }
