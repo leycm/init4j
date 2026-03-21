@@ -23,7 +23,7 @@ import java.util.function.Function;
  * class type per namespace.</p>
  *
  * <p>Static convenience methods are provided for both explicit namespace usage
- * and the {@link #DEFAULT_NAMESPACE}, which defaults to {@code "de.leycm.init4j"}.
+ * and the {@link #DEFAULT_NAMESPACE}, which defaults to {@code "default"}.
  * Lifecycle callbacks {@link #onInstall()} and {@link #onUninstall()} are invoked
  * automatically by the registry on registration and removal.</p>
  *
@@ -39,10 +39,10 @@ public interface Instanceable {
     /**
      * The default namespace used when no explicit namespace is provided.
      *
-     * <p>Defaults to {@code "de.leycm.init4j"}. All overloads without a
+     * <p>Defaults to {@code "default"}. All overloads without a
      * {@code namespace} parameter operate against this namespace.</p>
      */
-    String DEFAULT_NAMESPACE = "de.leycm.init4j";
+    String DEFAULT_NAMESPACE = "default";
 
     /**
      * Retrieves a registered instance by namespace and class type.
@@ -100,17 +100,17 @@ public interface Instanceable {
      * Throws if an instance of the same class is already registered in the namespace.</p>
      *
      * @param namespace the target namespace; must not be {@code null}
-     * @param instance the instance to register; must not be {@code null}
      * @param clazz the class type to associate with the instance; must not be {@code null}
+     * @param instance the instance to register; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @throws NullPointerException when an instance of {@code clazz} is already registered in the namespace
      */
     static <T extends Instanceable> void register(
             final @NonNull String namespace,
-            final @NonNull T instance,
-            final @NonNull Class<T> clazz
+            final @NonNull Class<T> clazz,
+            final @NonNull T instance
     ) throws NullPointerException {
-        InstanceableRegistry.register(namespace, instance, clazz);
+        InstanceableRegistry.register(namespace, clazz, instance);
     }
 
     /**
@@ -187,13 +187,13 @@ public interface Instanceable {
      * @param clazz the class type to associate with the instance; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @throws NullPointerException when an instance of {@code clazz} is already registered
-     * @see #register(String, Instanceable, Class)
+     * @see #register(String, Class, Instanceable)
      */
     static <T extends Instanceable> void register(
             final @NonNull T instance,
             final @NonNull Class<T> clazz
     ) throws NullPointerException {
-        InstanceableRegistry.register(DEFAULT_NAMESPACE, instance, clazz);
+        InstanceableRegistry.register(DEFAULT_NAMESPACE, clazz, instance);
     }
 
     /**

@@ -18,6 +18,7 @@ import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
@@ -32,7 +33,7 @@ import java.util.function.Function;
  * allowing multiple implementations of the same type within different contexts.</p>
  *
  * <p>Thread Safety: This class is thread-safe. All registry operations are backed
- * by {@link NoOverwriteRegistry}, which uses a {@link java.util.concurrent.ConcurrentHashMap}
+ * by {@link NoOverwriteRegistry}, which uses a {@link ConcurrentHashMap}
  * internally, ensuring safe concurrent access without external synchronization.</p>
  *
  * @since 1.0.0
@@ -171,8 +172,8 @@ public class InstanceableRegistry {
     @ApiStatus.Internal
     protected static <T extends Instanceable> void register(
             final @NonNull String namespace,
-            final @NonNull T instance,
-            final @NonNull Class<T> clazz
+            final @NonNull Class<T> clazz,
+            final @NonNull T instance
     ) throws NullPointerException, IllegalStateException {
         instance.onInstall();
         REGISTRY.register(toIdentifier(namespace, clazz), instance);
