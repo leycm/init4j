@@ -56,6 +56,8 @@ public class InstanceableRegistry {
     @ApiStatus.Internal
     private static final Registry<Instanceable> REGISTRY = Registries.noOverwriteRegistry(new ConcurrentHashRegistry<>());
 
+    // ==== Helper ============================================================
+
     /**
      * Builds a composite {@link Identifier} from a namespace string and a class type.
      *
@@ -77,6 +79,8 @@ public class InstanceableRegistry {
                 Identifier.sanitizeKey(clazz.getName())
         );
     }
+
+    // ==== Registry ==========================================================
 
     /**
      * Retrieves a registered instance by namespace and class type.

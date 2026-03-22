@@ -32,7 +32,6 @@ public abstract class MapRegistry<T> implements Registry<T> {
     @ApiStatus.Internal
     protected MapRegistry(final @NonNull Map<Identifier, T> store) {
         this.store = store;
-
     }
 
     /** {@inheritDoc} */

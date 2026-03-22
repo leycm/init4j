@@ -55,6 +55,8 @@ public final class Identifier {
     private final @NonNull String toStringCache;
     private final int hashCodeCache;
 
+    // ==== Helper ============================================================
+
     /**
      * Validates that the given namespace is non-blank and contains only allowed characters.
      *
@@ -159,6 +161,8 @@ public final class Identifier {
         return KEY_SANITIZE.matcher(key).replaceAll("_");
     }
 
+    // ==== Constructor =======================================================
+
     /**
      * Creates a new {@link Identifier} from the given namespace and key strings.
      *
@@ -220,6 +224,8 @@ public final class Identifier {
         this.toStringCache = namespace + ":" + key;
         this.hashCodeCache = toStringCache.hashCode();
     }
+
+    // ==== Body Methods ======================================================
 
     /**
      * Returns the namespace component of this identifier.

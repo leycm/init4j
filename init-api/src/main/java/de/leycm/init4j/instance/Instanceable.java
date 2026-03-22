@@ -44,6 +44,8 @@ public interface Instanceable {
      */
     String DEFAULT_NAMESPACE = "default";
 
+    // ==== getInstance =======================================================
+
     /**
      * Retrieves a registered instance by namespace and class type.
      *
@@ -59,6 +61,23 @@ public interface Instanceable {
     ) throws NullPointerException {
         return InstanceableRegistry.getInstance(namespace, clazz);
     }
+
+    /**
+     * Retrieves a registered instance from the {@link #DEFAULT_NAMESPACE} by class type.
+     *
+     * @param clazz the class type of the instance to retrieve; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @return the registered instance; never {@code null}
+     * @throws NullPointerException when no instance is registered for the given class
+     * @see #getInstance(String, Class)
+     */
+    static <T extends Instanceable> @NonNull T getInstance(
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        return InstanceableRegistry.getInstance(DEFAULT_NAMESPACE, clazz);
+    }
+
+    // ==== computeIfAbsent ===================================================
 
     /**
      * Returns the existing instance for the given namespace and class type, or computes and registers one if absent.
@@ -79,6 +98,25 @@ public interface Instanceable {
     }
 
     /**
+     * Returns the existing instance from the {@link #DEFAULT_NAMESPACE}, or computes and registers one if absent.
+     *
+     * @param clazz the class type of the instance; must not be {@code null}
+     * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @return the existing or newly computed instance; never {@code null}
+     * @throws NullPointerException when the computed instance is {@code null}
+     * @see #computeIfAbsent(String, Class, Function)
+     */
+    static <T extends Instanceable> @NonNull T computeIfAbsent(
+            final @NonNull Class<T> clazz,
+            final @NonNull Function<Class<?>, T> mappingFunction
+    ) throws NullPointerException {
+        return InstanceableRegistry.computeIfAbsent(DEFAULT_NAMESPACE, clazz, mappingFunction);
+    }
+
+    // ==== hasInstance =======================================================
+
+    /**
      * Returns whether an instance is registered for the given namespace and class type.
      *
      * @param namespace the target namespace; must not be {@code null}
@@ -92,6 +130,22 @@ public interface Instanceable {
     ) throws NullPointerException {
         return InstanceableRegistry.hasInstance(namespace, clazz);
     }
+
+    /**
+     * Returns whether an instance is registered in the {@link #DEFAULT_NAMESPACE} for the given class type.
+     *
+     * @param clazz the class type to check; must not be {@code null}
+     * @return {@code true} if an instance is registered, {@code false} otherwise
+     * @throws NullPointerException when {@code clazz} is {@code null}
+     * @see #hasInstance(String, Class)
+     */
+    static boolean hasInstance(
+            final @NonNull Class<?> clazz
+    ) throws NullPointerException {
+        return InstanceableRegistry.hasInstance(DEFAULT_NAMESPACE, clazz);
+    }
+
+    // ==== register ==========================================================
 
     /**
      * Registers an instance under the given namespace and class type.
@@ -114,70 +168,6 @@ public interface Instanceable {
     }
 
     /**
-     * Removes the registered instance for the given namespace and class type.
-     *
-     * <p>Triggers {@link #onUninstall()} on the instance before removal.
-     * Throws if no instance of the given class is currently registered in the namespace.</p>
-     *
-     * @param namespace the target namespace; must not be {@code null}
-     * @param clazz the class type of the instance to remove; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws NullPointerException when no instance of {@code clazz} is registered in the namespace
-     */
-    static <T extends Instanceable> void unregister(
-            final @NonNull String namespace,
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        InstanceableRegistry.unregister(namespace, clazz);
-    }
-
-    /**
-     * Retrieves a registered instance from the {@link #DEFAULT_NAMESPACE} by class type.
-     *
-     * @param clazz the class type of the instance to retrieve; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @return the registered instance; never {@code null}
-     * @throws NullPointerException when no instance is registered for the given class
-     * @see #getInstance(String, Class)
-     */
-    static <T extends Instanceable> @NonNull T getInstance(
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        return InstanceableRegistry.getInstance(DEFAULT_NAMESPACE, clazz);
-    }
-
-    /**
-     * Returns the existing instance from the {@link #DEFAULT_NAMESPACE}, or computes and registers one if absent.
-     *
-     * @param clazz the class type of the instance; must not be {@code null}
-     * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @return the existing or newly computed instance; never {@code null}
-     * @throws NullPointerException when the computed instance is {@code null}
-     * @see #computeIfAbsent(String, Class, Function)
-     */
-    static <T extends Instanceable> @NonNull T computeIfAbsent(
-            final @NonNull Class<T> clazz,
-            final @NonNull Function<Class<?>, T> mappingFunction
-    ) throws NullPointerException {
-        return InstanceableRegistry.computeIfAbsent(DEFAULT_NAMESPACE, clazz, mappingFunction);
-    }
-
-    /**
-     * Returns whether an instance is registered in the {@link #DEFAULT_NAMESPACE} for the given class type.
-     *
-     * @param clazz the class type to check; must not be {@code null}
-     * @return {@code true} if an instance is registered, {@code false} otherwise
-     * @throws NullPointerException when {@code clazz} is {@code null}
-     * @see #hasInstance(String, Class)
-     */
-    static boolean hasInstance(
-            final @NonNull Class<?> clazz
-    ) throws NullPointerException {
-        return InstanceableRegistry.hasInstance(DEFAULT_NAMESPACE, clazz);
-    }
-
-    /**
      * Registers an instance in the {@link #DEFAULT_NAMESPACE} under the given class type.
      *
      * <p>Triggers {@link #onInstall()} on the instance before it is stored.
@@ -196,6 +186,26 @@ public interface Instanceable {
         InstanceableRegistry.register(DEFAULT_NAMESPACE, clazz, instance);
     }
 
+    // ==== unregister ========================================================
+
+    /**
+     * Removes the registered instance for the given namespace and class type.
+     *
+     * <p>Triggers {@link #onUninstall()} on the instance before removal.
+     * Throws if no instance of the given class is currently registered in the namespace.</p>
+     *
+     * @param namespace the target namespace; must not be {@code null}
+     * @param clazz the class type of the instance to remove; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws NullPointerException when no instance of {@code clazz} is registered in the namespace
+     */
+    static <T extends Instanceable> void unregister(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException {
+        InstanceableRegistry.unregister(namespace, clazz);
+    }
+
     /**
      * Removes the registered instance from the {@link #DEFAULT_NAMESPACE} for the given class type.
      *
@@ -212,6 +222,8 @@ public interface Instanceable {
     ) throws NullPointerException {
         InstanceableRegistry.unregister(DEFAULT_NAMESPACE, clazz);
     }
+
+    // ==== Lifecycle callbacks ===============================================
 
     /**
      * Called when this instance is registered in the {@link InstanceableRegistry}.
