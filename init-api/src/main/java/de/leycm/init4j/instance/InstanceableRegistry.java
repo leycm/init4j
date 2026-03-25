@@ -98,7 +98,7 @@ public class InstanceableRegistry {
      */
     @ApiStatus.Internal
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Instanceable> @NonNull T getInstance(
+    static <T extends Instanceable> @NonNull T getInstance(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
     ) throws NullPointerException, ClassCastException {
@@ -129,7 +129,7 @@ public class InstanceableRegistry {
      */
     @ApiStatus.Internal
     @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
-    protected static <T extends Instanceable> @NonNull T computeIfAbsent(
+    static <T extends Instanceable> @NonNull T computeIfAbsent(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz,
             final @NonNull Function<Class<?>, T> mappingFunction
@@ -153,7 +153,7 @@ public class InstanceableRegistry {
      * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
-    protected static boolean hasInstance(
+    static boolean hasInstance(
             final @NonNull String namespace,
             final @NonNull Class<?> clazz
     ) throws NullPointerException {
@@ -174,7 +174,7 @@ public class InstanceableRegistry {
      * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
-    protected static <T extends Instanceable> void register(
+    static <T extends Instanceable> void register(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz,
             final @NonNull T instance
@@ -196,7 +196,7 @@ public class InstanceableRegistry {
      * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
      */
     @ApiStatus.Internal
-    protected static <T extends Instanceable> void unregister(
+    static <T extends Instanceable> void unregister(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
     ) throws NullPointerException, IllegalStateException {
