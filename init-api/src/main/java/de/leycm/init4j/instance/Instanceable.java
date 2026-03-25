@@ -28,13 +28,95 @@ import java.util.function.Function;
  * automatically by the registry on registration and removal.</p>
  *
  * <p>Thread Safety: Thread safety is delegated to {@link InstanceableRegistry},
- * which uses {@link java.util.concurrent.ConcurrentHashMap} internally.</p>
+* which uses {@link ConcurrentHashMap} internally.</p>
  *
  * @since 1.0.0
  * @see InstanceableRegistry
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
 public interface Instanceable {
+
+    // ==== register ==========================================================
+
+    /**
+     * Registers an instance under the given namespace and class type.
+     *
+     * <p>Triggers {@link #onInstall()} on the instance before it is stored.
+     * Throws if an instance of the same class is already registered in the namespace.</p>
+     *
+     * @param namespace the target namespace; must not be {@code null}
+     * @param clazz the class type to associate with the instance; must not be {@code null}
+     * @param instance the instance to register; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when an instance of {@code clazz} is already registered in the namespace
+     * @throws NullPointerException when {@code namespace}, {@code clazz}, or {@code instance} is {@code null}
+     */
+    static <T extends Instanceable> void register(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz,
+            final @NonNull T instance
+    ) throws IllegalStateException, NullPointerException {
+        InstanceableRegistry.register(namespace, clazz, instance);
+    }
+
+    /**
+     * Registers an instance in the {@link #DEFAULT_NAMESPACE} under the given class type.
+     *
+     * <p>Triggers {@link #onInstall()} on the instance before it is stored.
+     * Throws if an instance of the same class is already registered.</p>
+     *
+     * @param instance the instance to register; must not be {@code null}
+     * @param clazz the class type to associate with the instance; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when an instance of {@code clazz} is already registered
+     * @throws NullPointerException when {@code instance} or {@code clazz} is {@code null}
+     * @see #register(String, Class, Instanceable)
+     */
+    static <T extends Instanceable> void register(
+            final @NonNull T instance,
+            final @NonNull Class<T> clazz
+    ) throws IllegalStateException, NullPointerException {
+        InstanceableRegistry.register(DEFAULT_NAMESPACE, clazz, instance);
+    }
+
+    // ==== unregister ========================================================
+
+    /**
+     * Removes the registered instance for the given namespace and class type.
+     *
+     * <p>Triggers {@link #onUninstall()} on the instance before removal.
+     * Throws if no instance of the given class is currently registered in the namespace.</p>
+     *
+     * @param namespace the target namespace; must not be {@code null}
+     * @param clazz the class type of the instance to remove; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when no instance of {@code clazz} is registered in the namespace
+     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
+     */
+    static <T extends Instanceable> void unregister(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws IllegalStateException, NullPointerException {
+        InstanceableRegistry.unregister(namespace, clazz);
+    }
+
+    /**
+     * Removes the registered instance from the {@link #DEFAULT_NAMESPACE} for the given class type.
+     *
+     * <p>Triggers {@link #onUninstall()} on the instance before removal.
+     * Throws if no instance of the given class is currently registered.</p>
+     *
+     * @param clazz the class type of the instance to remove; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when no instance of {@code clazz} is registered
+     * @throws NullPointerException when {@code clazz} is {@code null}
+     * @see #unregister(String, Class)
+     */
+    static <T extends Instanceable> void unregister(
+            final @NonNull Class<T> clazz
+    ) throws IllegalStateException, NullPointerException {
+        InstanceableRegistry.unregister(DEFAULT_NAMESPACE, clazz);
+    }
 
     /**
      * The default namespace used when no explicit namespace is provided.
@@ -53,12 +135,13 @@ public interface Instanceable {
      * @param clazz the class type of the instance to retrieve; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @return the registered instance; never {@code null}
-     * @throws NullPointerException when no instance is registered for the given class in the namespace
+     * @throws IllegalStateException when no instance is registered for {@code clazz} in the namespace
+     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
      */
     static <T extends Instanceable> @NonNull T getInstance(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
-    ) throws NullPointerException {
+    ) throws IllegalStateException, NullPointerException {
         return InstanceableRegistry.getInstance(namespace, clazz);
     }
 
@@ -68,12 +151,13 @@ public interface Instanceable {
      * @param clazz the class type of the instance to retrieve; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @return the registered instance; never {@code null}
-     * @throws NullPointerException when no instance is registered for the given class
+     * @throws IllegalStateException when no instance is registered for {@code clazz}
+     * @throws NullPointerException when {@code clazz} is {@code null}
      * @see #getInstance(String, Class)
      */
     static <T extends Instanceable> @NonNull T getInstance(
             final @NonNull Class<T> clazz
-    ) throws NullPointerException {
+    ) throws IllegalStateException, NullPointerException {
         return InstanceableRegistry.getInstance(DEFAULT_NAMESPACE, clazz);
     }
 
@@ -87,13 +171,14 @@ public interface Instanceable {
      * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @return the existing or newly computed instance; never {@code null}
-     * @throws NullPointerException when the computed instance is {@code null}
+     * @throws ClassCastException when the resulting instance is not assignment-compatible with {@code clazz}
+     * @throws NullPointerException when {@code namespace}, {@code clazz}, {@code mappingFunction}, or the computed instance is {@code null}
      */
     static <T extends Instanceable> @NonNull T computeIfAbsent(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz,
             final @NonNull Function<Class<?>, T> mappingFunction
-    ) throws NullPointerException {
+    ) throws ClassCastException, NullPointerException {
         return InstanceableRegistry.computeIfAbsent(namespace, clazz, mappingFunction);
     }
 
@@ -104,13 +189,14 @@ public interface Instanceable {
      * @param mappingFunction the function used to compute a new instance if none exists; must not be {@code null}
      * @param <T> the type of the {@link Instanceable} instance
      * @return the existing or newly computed instance; never {@code null}
-     * @throws NullPointerException when the computed instance is {@code null}
+     * @throws ClassCastException when the resulting instance is not assignment-compatible with {@code clazz}
+     * @throws NullPointerException when {@code clazz}, {@code mappingFunction}, or the computed instance is {@code null}
      * @see #computeIfAbsent(String, Class, Function)
      */
     static <T extends Instanceable> @NonNull T computeIfAbsent(
             final @NonNull Class<T> clazz,
             final @NonNull Function<Class<?>, T> mappingFunction
-    ) throws NullPointerException {
+    ) throws ClassCastException, NullPointerException {
         return InstanceableRegistry.computeIfAbsent(DEFAULT_NAMESPACE, clazz, mappingFunction);
     }
 
@@ -143,84 +229,6 @@ public interface Instanceable {
             final @NonNull Class<?> clazz
     ) throws NullPointerException {
         return InstanceableRegistry.hasInstance(DEFAULT_NAMESPACE, clazz);
-    }
-
-    // ==== register ==========================================================
-
-    /**
-     * Registers an instance under the given namespace and class type.
-     *
-     * <p>Triggers {@link #onInstall()} on the instance before it is stored.
-     * Throws if an instance of the same class is already registered in the namespace.</p>
-     *
-     * @param namespace the target namespace; must not be {@code null}
-     * @param clazz the class type to associate with the instance; must not be {@code null}
-     * @param instance the instance to register; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws NullPointerException when an instance of {@code clazz} is already registered in the namespace
-     */
-    static <T extends Instanceable> void register(
-            final @NonNull String namespace,
-            final @NonNull Class<T> clazz,
-            final @NonNull T instance
-    ) throws NullPointerException {
-        InstanceableRegistry.register(namespace, clazz, instance);
-    }
-
-    /**
-     * Registers an instance in the {@link #DEFAULT_NAMESPACE} under the given class type.
-     *
-     * <p>Triggers {@link #onInstall()} on the instance before it is stored.
-     * Throws if an instance of the same class is already registered.</p>
-     *
-     * @param instance the instance to register; must not be {@code null}
-     * @param clazz the class type to associate with the instance; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws NullPointerException when an instance of {@code clazz} is already registered
-     * @see #register(String, Class, Instanceable)
-     */
-    static <T extends Instanceable> void register(
-            final @NonNull T instance,
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        InstanceableRegistry.register(DEFAULT_NAMESPACE, clazz, instance);
-    }
-
-    // ==== unregister ========================================================
-
-    /**
-     * Removes the registered instance for the given namespace and class type.
-     *
-     * <p>Triggers {@link #onUninstall()} on the instance before removal.
-     * Throws if no instance of the given class is currently registered in the namespace.</p>
-     *
-     * @param namespace the target namespace; must not be {@code null}
-     * @param clazz the class type of the instance to remove; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws NullPointerException when no instance of {@code clazz} is registered in the namespace
-     */
-    static <T extends Instanceable> void unregister(
-            final @NonNull String namespace,
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        InstanceableRegistry.unregister(namespace, clazz);
-    }
-
-    /**
-     * Removes the registered instance from the {@link #DEFAULT_NAMESPACE} for the given class type.
-     *
-     * <p>Triggers {@link #onUninstall()} on the instance before removal.
-     * Throws if no instance of the given class is currently registered.</p>
-     *
-     * @param clazz the class type of the instance to remove; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws NullPointerException when no instance of {@code clazz} is registered
-     * @see #unregister(String, Class)
-     */
-    static <T extends Instanceable> void unregister(
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException {
-        InstanceableRegistry.unregister(DEFAULT_NAMESPACE, clazz);
     }
 
     // ==== Lifecycle callbacks ===============================================

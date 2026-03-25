@@ -15,6 +15,7 @@ import de.leycm.init4j.registries.NoOverwriteRegistry;
 import de.leycm.init4j.registry.Registries;
 import de.leycm.init4j.registries.ConcurrentHashRegistry;
 import de.leycm.init4j.registry.Registry;
+
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -40,7 +41,7 @@ import java.util.function.Function;
  * @see Instanceable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public class InstanceableRegistry {
+public final class InstanceableRegistry {
 
     /**
      * Private constructor to prevent instantiation.
@@ -83,6 +84,50 @@ public class InstanceableRegistry {
     // ==== Registry ==========================================================
 
     /**
+     * Registers an instance under the given namespace and class type.
+     *
+     * <p>Invokes {@link Instanceable#onInstall()} on the instance before storing it.
+     * Throws if an instance of the same class type is already registered in the namespace.</p>
+     *
+     * @param namespace the target namespace; must not be {@code null}
+     * @param instance the instance to register; must not be {@code null}
+     * @param clazz the class type to associate with the instance; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when an instance of {@code clazz} is already registered in the namespace
+     * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null}
+     */
+    @ApiStatus.Internal
+    static <T extends Instanceable> void register(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz,
+            final @NonNull T instance
+    ) throws NullPointerException, IllegalStateException {
+        REGISTRY.register(toIdentifier(namespace, clazz), instance);
+        instance.onInstall();
+    }
+
+    /**
+     * Removes the registered instance for the given namespace and class type.
+     *
+     * <p>Invokes {@link Instanceable#onUninstall()} on the instance before removing it.
+     * Throws if no instance of the given class type is currently registered in the namespace.</p>
+     *
+     * @param namespace the target namespace; must not be {@code null}
+     * @param clazz the class type of the instance to remove; must not be {@code null}
+     * @param <T> the type of the {@link Instanceable} instance
+     * @throws IllegalStateException when no instance of {@code clazz} is registered in the namespace
+     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
+     */
+    @ApiStatus.Internal
+    static <T extends Instanceable> void unregister(
+            final @NonNull String namespace,
+            final @NonNull Class<T> clazz
+    ) throws NullPointerException, IllegalStateException {
+        final Identifier id = toIdentifier(namespace, clazz);
+        REGISTRY.unregister(id).onUninstall();
+    }
+
+    /**
      * Retrieves a registered instance by namespace and class type.
      *
      * <p>The {@code @SuppressWarnings("unchecked")} is safe because
@@ -97,7 +142,7 @@ public class InstanceableRegistry {
      * @throws ClassCastException when the registered instance is not assignment-compatible with {@code clazz}
      */
     @ApiStatus.Internal
-    @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
+    @SuppressWarnings("unchecked") // cause: is checked by clazz.isInstance(instance) before
     static <T extends Instanceable> @NonNull T getInstance(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz
@@ -128,7 +173,7 @@ public class InstanceableRegistry {
      * @throws ClassCastException when the resulting instance is not assignment-compatible with {@code clazz}
      */
     @ApiStatus.Internal
-    @SuppressWarnings("unchecked") // is checked by clazz.isInstance(instance) before
+    @SuppressWarnings("unchecked") // cause: is checked by clazz.isInstance(instance) before
     static <T extends Instanceable> @NonNull T computeIfAbsent(
             final @NonNull String namespace,
             final @NonNull Class<T> clazz,
@@ -158,49 +203,5 @@ public class InstanceableRegistry {
             final @NonNull Class<?> clazz
     ) throws NullPointerException {
         return REGISTRY.has(toIdentifier(namespace, clazz));
-    }
-
-    /**
-     * Registers an instance under the given namespace and class type.
-     *
-     * <p>Invokes {@link Instanceable#onInstall()} on the instance before storing it.
-     * Throws if an instance of the same class type is already registered in the namespace.</p>
-     *
-     * @param namespace the target namespace; must not be {@code null}
-     * @param instance the instance to register; must not be {@code null}
-     * @param clazz the class type to associate with the instance; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws IllegalStateException when an instance of {@code clazz} is already registered in the namespace
-     * @throws NullPointerException when {@code namespace}, {@code instance}, or {@code clazz} is {@code null}
-     */
-    @ApiStatus.Internal
-    static <T extends Instanceable> void register(
-            final @NonNull String namespace,
-            final @NonNull Class<T> clazz,
-            final @NonNull T instance
-    ) throws NullPointerException, IllegalStateException {
-        instance.onInstall();
-        REGISTRY.register(toIdentifier(namespace, clazz), instance);
-    }
-
-    /**
-     * Removes the registered instance for the given namespace and class type.
-     *
-     * <p>Invokes {@link Instanceable#onUninstall()} on the instance before removing it.
-     * Throws if no instance of the given class type is currently registered in the namespace.</p>
-     *
-     * @param namespace the target namespace; must not be {@code null}
-     * @param clazz the class type of the instance to remove; must not be {@code null}
-     * @param <T> the type of the {@link Instanceable} instance
-     * @throws IllegalStateException when no instance of {@code clazz} is registered in the namespace
-     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
-     */
-    @ApiStatus.Internal
-    static <T extends Instanceable> void unregister(
-            final @NonNull String namespace,
-            final @NonNull Class<T> clazz
-    ) throws NullPointerException, IllegalStateException {
-        Identifier id = toIdentifier(namespace, clazz);
-        REGISTRY.unregister(id).onUninstall();
     }
 }

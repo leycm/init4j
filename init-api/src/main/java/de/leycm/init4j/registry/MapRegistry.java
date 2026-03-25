@@ -3,6 +3,7 @@ package de.leycm.init4j.registry;
 import de.leycm.init4j.identifier.Identifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
@@ -96,17 +97,26 @@ public abstract class MapRegistry<T> implements Registry<T> {
         return value;
     }
 
+    @Override
+    public @NotNull T getOrDefault(@NonNull Identifier id, @NotNull T value) {
+        return store.getOrDefault(id, value);
+    }
+
     /**
      * {@inheritDoc}
-     *
-     * <p><b>Note:</b> The {@code supplier} is evaluated eagerly before the map
-     * lookup, the fallback value is always computed regardless of whether
-     * {@code id} is present.</p>
      */
     @Override
     public @NonNull T getOrDefault(final @NonNull Identifier id,
                                    final @NonNull Supplier<T> supplier) {
-        return store.getOrDefault(id, supplier.get());
+        T value = store.get(id);
+        if (value == null) {
+            value = supplier.get();
+        }
+
+        if (value == null)
+            throw new NullPointerException("Supplier returned null for identifier '" + id + "'");
+
+        return value;
     }
 
     /** {@inheritDoc} */

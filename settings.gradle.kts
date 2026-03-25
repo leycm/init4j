@@ -23,14 +23,14 @@ fun getGradleProperty(name: String): String? {
 
 // Gradle Dependency Mgmt
 dependencyResolutionManagement {
-    println("[+] Checking gradle.properties for version-catalog...")
+    logger.debug("[+] Checking gradle.properties for version-catalog...")
     val versionCatalogProp = getGradleProperty("version-catalog")
     if (versionCatalogProp.isNullOrEmpty() || versionCatalogProp == "gradle/libs.versions.toml")
         return@dependencyResolutionManagement
 
     versionCatalogs {
         create("libs") {
-            println("[+] Loading $versionCatalogProp ...")
+            logger.info("[+] Loading $versionCatalogProp ...")
             from(files("$rootDir/$versionCatalogProp"))
         }
     }

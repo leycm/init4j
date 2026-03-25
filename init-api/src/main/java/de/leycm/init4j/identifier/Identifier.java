@@ -28,12 +28,12 @@ import java.util.regex.Pattern;
  * constructor returns.</p>
  *
  * @since 1.0.0
- * @see Identifiable
+ * @see Keyable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public final class Identifier {
+public class Identifier {
 
-    @SuppressWarnings("RegExpRedundantEscape") // needed for regex even if it doesn't need it for Java string
+    @SuppressWarnings("RegExpRedundantEscape") // cause: needed for regex even if it doesn't need it for Java string
     private static final String KEY_CHARS = "a-zA-Z0-9._\\-/*+#,;";
     private static final String NAMESPACE_CHARS = "a-z0-9._-";
 
@@ -66,6 +66,7 @@ public final class Identifier {
      *
      * @param namespace the namespace to validate; must not be {@code null}
      * @throws IllegalArgumentException when the namespace is blank or contains invalid characters
+     * @throws NullPointerException when {@code namespace} is {@code null}
      */
     public static void validateNamespace(final @NonNull String namespace) {
         if (namespace.isBlank()) {
@@ -85,6 +86,7 @@ public final class Identifier {
      *
      * @param key the key to validate; must not be {@code null}
      * @throws IllegalArgumentException when the key is blank or contains invalid characters
+     * @throws NullPointerException when {@code key} is {@code null}
      */
     public static void validateKey(final @NonNull String key) {
         if (key.isBlank()) {
@@ -142,6 +144,7 @@ public final class Identifier {
      *
      * @param namespace the namespace string to sanitize; must not be {@code null}
      * @return the sanitized namespace; never {@code null}
+     * @throws NullPointerException when {@code namespace} is {@code null}
      */
     public static @NonNull String sanitizeNamespace(final @NonNull String namespace) {
         return NAMESPACE_SANITIZE.matcher(namespace.toLowerCase()).replaceAll("_");
@@ -156,6 +159,7 @@ public final class Identifier {
      *
      * @param key the key string to sanitize; must not be {@code null}
      * @return the sanitized key; never {@code null}
+     * @throws NullPointerException when {@code key} is {@code null}
      */
     public static @NonNull String sanitizeKey(final @NonNull String key) {
         return KEY_SANITIZE.matcher(key).replaceAll("_");
@@ -164,12 +168,41 @@ public final class Identifier {
     // ==== Constructor =======================================================
 
     /**
+     * Creates a new {@link Identifier} using the string representation of the given class as the key.
+     *
+     * @param namespace the namespace; must not be {@code null} or blank
+     * @param clazz the class whose {@link Class#toString()} value is used as the key; must not be {@code null}
+     * @return a new identifier; never {@code null}
+     * @throws IllegalArgumentException when the namespace is blank or the derived key contains invalid characters
+     * @throws NullPointerException when {@code namespace} or {@code clazz} is {@code null}
+     */
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull Class<?> clazz) {
+        return new Identifier(namespace, clazz.getName());
+    }
+
+    /**
+     * Creates a new {@link Identifier} using the string representation of the given {@link UUID} as the key.
+     *
+     * @param namespace the namespace; must not be {@code null} or blank
+     * @param uuid the UUID to use as the key; must not be {@code null}
+     * @return a new identifier; never {@code null}
+     * @throws IllegalArgumentException when the namespace is blank or contains invalid characters
+     * @throws NullPointerException when {@code namespace} or {@code uuid} is {@code null}
+     */
+    public static @NonNull Identifier of(final @NonNull String namespace,
+                                         final @NonNull UUID uuid) {
+        return new Identifier(namespace, uuid.toString());
+    }
+
+    /**
      * Creates a new {@link Identifier} from the given namespace and key strings.
      *
      * @param namespace the namespace; must not be {@code null} or blank
      * @param key the key; must not be {@code null} or blank
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace or key is blank or contains invalid characters
+     * @throws NullPointerException when {@code namespace} or {@code key} is {@code null}
      */
     public static @NonNull Identifier of(final @NonNull String namespace,
                                          final @NonNull String key) {
@@ -177,42 +210,31 @@ public final class Identifier {
     }
 
     /**
-     * Creates a new {@link Identifier} using the string representation of the given class as the key.
+     * Creates a new {@link Identifier} using {@link Keyable#toKey()} on the given object as the key.
      *
      * @param namespace the namespace; must not be {@code null} or blank
-     * @param key the class whose {@link Class#toString()} value is used as the key; must not be {@code null}
+     * @param keyable the Keyable instance to resolve a Key from; must not be {@code null}
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace is blank or the derived key contains invalid characters
+     * @throws NullPointerException when {@code namespace} or {@code keyable} is {@code null}
      */
     public static @NonNull Identifier of(final @NonNull String namespace,
-                                         final @NonNull Class<?> key) {
-        return new Identifier(namespace, key.toString());
-    }
-
-    /**
-     * Creates a new {@link Identifier} using the string representation of the given {@link UUID} as the key.
-     *
-     * @param namespace the namespace; must not be {@code null} or blank
-     * @param key the UUID to use as the key; must not be {@code null}
-     * @return a new identifier; never {@code null}
-     * @throws IllegalArgumentException when the namespace is blank or contains invalid characters
-     */
-    public static @NonNull Identifier of(final @NonNull String namespace,
-                                         final @NonNull UUID key) {
-        return new Identifier(namespace, key.toString());
+                                         final @NonNull Keyable keyable) {
+        return new Identifier(namespace, keyable.toKey());
     }
 
     /**
      * Creates a new {@link Identifier} using {@link String#valueOf(Object)} on the given object as the key.
      *
      * @param namespace the namespace; must not be {@code null} or blank
-     * @param key the object whose string value is used as the key; must not be {@code null}
+     * @param o the object whose string value is used as the key; must not be {@code null}
      * @return a new identifier; never {@code null}
      * @throws IllegalArgumentException when the namespace is blank or the derived key contains invalid characters
+     * @throws NullPointerException when {@code namespace} or {@code o} is {@code null}
      */
     public static @NonNull Identifier of(final @NonNull String namespace,
-                                         final @NonNull Object key) {
-        return new Identifier(namespace, String.valueOf(key));
+                                         final @NonNull Object o) {
+        return new Identifier(namespace, String.valueOf(o));
     }
 
     private Identifier(final @NonNull String namespace, final @NonNull String key) {

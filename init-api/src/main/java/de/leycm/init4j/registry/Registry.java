@@ -41,7 +41,7 @@ public interface Registry<T> extends Iterable<T> {
     /**
      * Retrieves the value associated with the given identifier.
      *
-     * <p>Unlike most {@link java.util.Map} lookups, this method never returns
+     * <p>Unlike most {@link Map} lookups, this method never returns
      * {@code null} — implementations are expected to throw when the key is absent.</p>
      *
      * @param id the identifier to look up; must not be {@code null}
@@ -78,6 +78,21 @@ public interface Registry<T> extends Iterable<T> {
      * @throws NullPointerException when any argument is {@code null}
      */
     @NonNull T computeIfAbsent(@NonNull Identifier id, @NonNull Function<Identifier, T> mappingFunction);
+
+    /**
+     * Returns the existing value for {@code id}, or {@code value} if no entry exists.
+     *
+     * <p><b>Note:</b> Implementations that don't evaluate the {@code supplier} eagerly.
+     * should overwrite this.</p>
+     *
+     * @param id    the identifier; must not be {@code null}
+     * @param value the fallback value; must not be {@code null}
+     * @return the existing or fallback value; never {@code null}
+     * @throws NullPointerException when any argument is {@code null}
+     */
+    default @NonNull T getOrDefault(@NonNull Identifier id, @NonNull T value) {
+        return getOrDefault(id, () -> value);
+    }
 
     /**
      * Returns the existing value for {@code id}, or the value produced by {@code supplier}

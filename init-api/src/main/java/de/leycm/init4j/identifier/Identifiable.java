@@ -33,6 +33,7 @@ public interface Identifiable {
      *
      * @param identifier the identifier to compare against; must not be {@code null}
      * @return {@code true} if the identifiers are equal, {@code false} otherwise
+     * @throws NullPointerException when {@code identifier} is {@code null}
      */
     default boolean identify(final @NonNull Identifier identifier) {
         return this.identifier().equals(identifier);
@@ -44,6 +45,7 @@ public interface Identifiable {
      *
      * @param identifiable the identifiable to compare against; must not be {@code null}
      * @return {@code true} if the identifiers are equal, {@code false} otherwise
+     * @throws NullPointerException when {@code identifiable} is {@code null}
      */
     default boolean identify(final @NonNull Identifiable identifiable) {
         return this.identifier().equals(identifiable.identifier());
