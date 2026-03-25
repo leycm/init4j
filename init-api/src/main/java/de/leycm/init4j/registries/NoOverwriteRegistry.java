@@ -1,6 +1,7 @@
 package de.leycm.init4j.registries;
 
 import de.leycm.init4j.identifier.Identifier;
+import de.leycm.init4j.registry.Registries;
 import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
@@ -41,7 +42,7 @@ public class NoOverwriteRegistry<T> implements Registry<T> {
      * @param store the backing registry; must not be {@code null}
      */
     @ApiStatus.Internal
-    protected NoOverwriteRegistry(final @NonNull Registry<T> store) {
+    public NoOverwriteRegistry(final @NonNull Registry<T> store) {
         this.store = store;
     }
 
