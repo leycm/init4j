@@ -3,6 +3,7 @@ package de.leycm.init4j.identifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**

@@ -3,6 +3,7 @@ package de.leycm.init4j.registry;
 import de.leycm.init4j.identifier.Identifier;
 import lombok.NonNull;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,7 +43,7 @@ public interface Registry<T> extends Iterable<T> {
      * Retrieves the value associated with the given identifier.
      *
      * <p>Unlike most {@link Map} lookups, this method never returns
-     * {@code null} — implementations are expected to throw when the key is absent.</p>
+     * {@code null} - implementations are expected to throw when the key is absent.</p>
      *
      * @param id the identifier to look up; must not be {@code null}
      * @return the registered value; never {@code null}

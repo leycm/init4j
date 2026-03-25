@@ -12,6 +12,7 @@ package de.leycm.init4j.instance;
 
 import lombok.NonNull;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
