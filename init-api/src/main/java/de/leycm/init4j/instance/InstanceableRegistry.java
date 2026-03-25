@@ -12,8 +12,8 @@ package de.leycm.init4j.instance;
 
 import de.leycm.init4j.identifier.Identifier;
 import de.leycm.init4j.registries.NoOverwriteRegistry;
-import de.leycm.init4j.registries.Registries;
-import de.leycm.init4j.registry.ConcurrentHashRegistry;
+import de.leycm.init4j.registry.Registries;
+import de.leycm.init4j.registries.ConcurrentHashRegistry;
 import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;

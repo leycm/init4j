@@ -1,6 +1,8 @@
-package de.leycm.init4j.registry;
+package de.leycm.init4j.registries;
 
 import de.leycm.init4j.identifier.Identifier;
+import de.leycm.init4j.registry.MapRegistry;
+import de.leycm.init4j.registry.Registry;
 import lombok.NonNull;
 
 import java.util.HashMap;
