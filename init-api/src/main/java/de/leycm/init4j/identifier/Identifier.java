@@ -103,7 +103,7 @@ public class Identifier {
      * <p>Equivalent to calling {@link #validateNamespace(String)} and catching
      * any exception. Returns {@code false} for {@code null} input.</p>
      *
-     * @param namespace the namespace to check; may be {@code null}
+     * @param namespace the namespace to check; never {@code null}
      * @return {@code true} if the namespace is valid, {@code false} otherwise
      */
     public static boolean isValidNamespace(final @Nullable String namespace) {
@@ -122,7 +122,7 @@ public class Identifier {
      * <p>Equivalent to calling {@link #validateKey(String)} and catching
      * any exception. Returns {@code false} for {@code null} input.</p>
      *
-     * @param key the key to check; may be {@code null}
+     * @param key the key to check; never {@code null}
      * @return {@code true} if the key is valid, {@code false} otherwise
      */
     public static boolean isValidKey(final @Nullable String key) {
@@ -291,7 +291,7 @@ public class Identifier {
      * Returns {@code true} if the given object is an {@link Identifier} with the same
      * namespace and key as this instance.
      *
-     * @param obj the object to compare; may be {@code null}
+     * @param obj the object to compare; never {@code null}
      * @return {@code true} if equal, {@code false} otherwise
      */
     @Override
