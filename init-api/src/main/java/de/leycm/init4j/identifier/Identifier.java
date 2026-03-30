@@ -3,6 +3,7 @@ package de.leycm.init4j.identifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * @see Keyable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public class Identifier {
+public class Identifier implements Comparable<Identifier>, Serializable {
 
     @SuppressWarnings("RegExpRedundantEscape") // cause: needed for regex even if it doesn't need it for Java string
     private static final String KEY_CHARS = "a-zA-Z0-9._\\-/*+#,;";
@@ -237,7 +238,8 @@ public class Identifier {
         return new Identifier(namespace, String.valueOf(o));
     }
 
-    private Identifier(final @NonNull String namespace, final @NonNull String key) {
+    private Identifier(final @NonNull String namespace,
+                       final @NonNull String key) {
         validateKey(key);
         validateNamespace(namespace);
         this.namespace = namespace;
@@ -254,7 +256,7 @@ public class Identifier {
      *
      * @return the namespace; never {@code null}
      */
-    public @NonNull String namespace() {
+    public @NonNull String getNamespace() {
         return namespace;
     }
 
@@ -263,7 +265,7 @@ public class Identifier {
      *
      * @return the key; never {@code null}
      */
-    public @NonNull String key() {
+    public @NonNull String getKey() {
         return key;
     }
 
@@ -295,11 +297,27 @@ public class Identifier {
      * @return {@code true} if equal, {@code false} otherwise
      */
     @Override
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(final @Nullable Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Identifier) obj;
         return toStringCache.equals(that.toStringCache);
     }
 
+    /**
+     * Compares this identifier to another based on their canonical string forms.
+     *
+     * <p>Identifiers are ordered lexicographically by their {@code namespace:key}
+     * representation. This provides a consistent ordering that can be used for
+     * sorting or as keys in sorted collections.</p>
+     *
+     * @param identifier the identifier to compare to; must not be {@code null}
+     * @return a negative integer, zero, or a positive integer as this identifier
+     *         is less than, equal to, or greater than the specified identifier
+     * @throws NullPointerException when {@code identifier} is {@code null}
+     */
+    @Override
+    public int compareTo(final @NonNull Identifier identifier) {
+        return toStringCache.compareTo(identifier.toStringCache);
+    }
 }
