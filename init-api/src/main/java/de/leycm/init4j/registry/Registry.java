@@ -2,6 +2,7 @@ package de.leycm.init4j.registry;
 
 import de.leycm.init4j.identifier.Identifier;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public interface Registry<T> extends Iterable<T> {
      * @return the removed value, or {@code null} if no entry was registered for {@code id}
      * @throws NullPointerException when {@code id} is {@code null}
      */
-    T unregister(@NonNull Identifier id);
+    @Nullable T unregister(@NonNull Identifier id);
 
     /**
      * Retrieves the value associated with the given identifier.
