@@ -35,6 +35,8 @@ public abstract class MapRegistry<T> implements Registry<T> {
         this.store = store;
     }
 
+    // ==== Registry methods =================================================
+
     /** {@inheritDoc} */
     @Override
     public void register(final @NonNull Identifier id, final @NonNull T value) {
@@ -131,6 +133,8 @@ public abstract class MapRegistry<T> implements Registry<T> {
         return store.isEmpty();
     }
 
+    // ==== Object methods ====================================================
+
     /**
      * Returns an unmodifiable iterator over all registered values.
      *
@@ -140,7 +144,15 @@ public abstract class MapRegistry<T> implements Registry<T> {
      * @return an iterator over the values; never {@code null}
      */
     @Override
-    public @NonNull Iterator<T> iterator() {
-        return Collections.unmodifiableCollection(store.values()).iterator();
+    public @NonNull Iterator<RegistryPair<T>> iterator() {
+        // note: Map.Entry -> RegistryPair.Simple (typ explicit)
+        return store.entrySet().stream()
+                .<RegistryPair<T>>map(RegistryPair.Simple::new)
+                .iterator();
+    }
+
+    @Override
+    public @NonNull Map<Identifier, T> toMap() {
+        return Map.copyOf(store);
     }
 }

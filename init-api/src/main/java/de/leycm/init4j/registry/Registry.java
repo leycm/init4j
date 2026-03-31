@@ -4,6 +4,7 @@ import de.leycm.init4j.identifier.Identifier;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -20,7 +21,9 @@ import java.util.function.Supplier;
  * @since 1.0.0
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
-public interface Registry<T> extends Iterable<T> {
+public interface Registry<T> extends Iterable<RegistryPair<T>> {
+
+    // ==== Registry methods =================================================
 
     /**
      * Registers a value under the given identifier.
@@ -84,7 +87,7 @@ public interface Registry<T> extends Iterable<T> {
     /**
      * Returns the existing value for {@code id}, or {@code value} if no entry exists.
      *
-     * <p><b>Note:</b> Implementations that don't evaluate the {@code supplier} eagerly.
+     * <p>Note: Implementations that don't evaluate the {@code supplier} eagerly.
      * should overwrite this.</p>
      *
      * @param id    the identifier; must not be {@code null}
@@ -101,7 +104,7 @@ public interface Registry<T> extends Iterable<T> {
      * if no entry exists. Unlike {@link #computeIfAbsent}, the supplied value is
      * <em>not</em> registered.
      *
-     * <p><b>Note:</b> Implementations may evaluate the {@code supplier} eagerly.
+     * <p>Note: Implementations may evaluate the {@code supplier} eagerly.
      * Callers should not rely on lazy evaluation of the fallback.</p>
      *
      * @param id       the identifier; must not be {@code null}
@@ -111,8 +114,13 @@ public interface Registry<T> extends Iterable<T> {
      */
     @NonNull T getOrDefault(@NonNull Identifier id, @NonNull Supplier<T> supplier);
 
+    // ==== Object methods ====================================================
+
     /**
      * Returns the number of registered entries.
+     *
+     * <p>Note: Returns a positive integer if the registry contains entries, or zero if it is empty.
+     * Everything higher than {@link Integer#MAX_VALUE} will return {@link Integer#MAX_VALUE}.</p>
      *
      * @return the entry count; never negative
      */
@@ -124,4 +132,24 @@ public interface Registry<T> extends Iterable<T> {
      * @return {@code true} if empty, {@code false} otherwise
      */
     boolean isEmpty();
+
+    /**
+     * Returns a map view of this registry, where keys are identifiers and values are the registered entries.
+     *
+     * <p>Modifications to the returned map may <b>not</b> affect the registry.
+     * The map is guaranteed to reflect the current state of the registry at the time of calling.</p>
+     *
+     * @return a map view of this registry; never {@code null}
+     */
+    @NonNull Map<Identifier, T> toMap();
+
+    /**
+     * Returns an iterator over the registered entries as {@link RegistryPair} instances.
+     *
+     * <p>The iteration order depends on the implementation and may reflect insertion order, natural ordering,
+     * or be arbitrary. The returned iterator is unmodifiable and does not support {@code remove()}.</p>
+     *
+     * @return an iterator over the registry entries; never {@code null}
+     */
+    @NonNull Iterator<RegistryPair<T>> iterator();
 }

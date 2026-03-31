@@ -3,11 +3,13 @@ package de.leycm.init4j.registries;
 import de.leycm.init4j.identifier.Identifier;
 import de.leycm.init4j.registry.Registries;
 import de.leycm.init4j.registry.Registry;
+import de.leycm.init4j.registry.RegistryPair;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -35,6 +37,8 @@ public class NoOverwriteRegistry<T> implements Registry<T> {
 
     // backing registry all operations are delegated to
     private final Registry<T> store;
+
+    // ==== Registry methods =================================================
 
     /**
      * Creates a new no-overwrite registry wrapping the given backing {@link Registry}.
@@ -95,6 +99,8 @@ public class NoOverwriteRegistry<T> implements Registry<T> {
         return store.getOrDefault(id, supplier);
     }
 
+    // ==== Object methods ====================================================
+
     /** {@inheritDoc} */
     @Override
     public int size() {
@@ -109,7 +115,13 @@ public class NoOverwriteRegistry<T> implements Registry<T> {
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<T> iterator() {
+    public @NonNull Map<Identifier, T> toMap() {
+        return store.toMap();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public @NonNull Iterator<RegistryPair<T>> iterator() {
         return store.iterator();
     }
 }
