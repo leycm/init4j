@@ -73,7 +73,7 @@ public interface Keyable {
      * between implementations, but it must be consistent for equal objects
      * and should ideally be human-readable.</p>
      *
-     * <p><b>Note:</b> The implementation should always pass an
+     * <p>Note: The implementation should always pass an
      * {@link Identifier#validateKey(String)} check.</p>
      *
      * @return a non-{@code null} string key that uniquely identifies this object

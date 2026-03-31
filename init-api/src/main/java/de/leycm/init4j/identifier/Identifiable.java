@@ -26,7 +26,7 @@ public interface Identifiable {
      *
      * @return the identifier; never {@code null}
      */
-    @NonNull Identifier identifier();
+    @NonNull Identifier getIdentifier();
 
     /**
      * Returns {@code true} if this object's identifier equals the given identifier.
@@ -36,7 +36,7 @@ public interface Identifiable {
      * @throws NullPointerException when {@code identifier} is {@code null}
      */
     default boolean identify(final @NonNull Identifier identifier) {
-        return this.identifier().equals(identifier);
+        return this.getIdentifier().equals(identifier);
     }
 
     /**
@@ -48,7 +48,7 @@ public interface Identifiable {
      * @throws NullPointerException when {@code identifiable} is {@code null}
      */
     default boolean identify(final @NonNull Identifiable identifiable) {
-        return this.identifier().equals(identifiable.identifier());
+        return this.getIdentifier().equals(identifiable.getIdentifier());
     }
 
 }
