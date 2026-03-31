@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  * implementation passed at construction time.</p>
  *
  * @param <T> the type of values stored in this registry
- * @since 1.0.0
+ * @since 1.0
  * @see Registries
  * @see Registry
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>

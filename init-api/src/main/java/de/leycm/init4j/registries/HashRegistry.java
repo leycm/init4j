@@ -16,7 +16,7 @@ import java.util.Map;
  * concurrent access is required, use {@link ConcurrentHashRegistry} instead.</p>
  *
  * @param <T> the type of values stored in this registry
- * @since 1.0.0
+ * @since 1.0
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
 public class HashRegistry<T> extends MapRegistry<T> {

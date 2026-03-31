@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * with additional behavioral constraints. All returned instances delegate
  * their operations to the provided backing registry.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see UnmodifiableRegistry
  * @see NoOverwriteRegistry
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>

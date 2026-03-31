@@ -21,7 +21,7 @@ import java.util.function.Function;
  * <p>Thread Safety: The registry operations are thread-safe and backed by
 * {@link ConcurrentHashMap}.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see KeyableRegistry
  * @see Identifier
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>

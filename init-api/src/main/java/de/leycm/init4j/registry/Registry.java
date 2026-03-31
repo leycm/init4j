@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * forbid overwriting existing entries.</p>
  *
  * @param <T> the type of values stored in this registry
- * @since 1.0.0
+ * @since 1.0
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
 public interface Registry<T> extends Iterable<RegistryPair<T>> {

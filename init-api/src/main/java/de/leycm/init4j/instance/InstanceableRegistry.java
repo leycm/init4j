@@ -37,7 +37,7 @@ import java.util.function.Function;
  * by {@link NoOverwriteRegistry}, which uses a {@link ConcurrentHashMap}
  * internally, ensuring safe concurrent access without external synchronization.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see Instanceable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */

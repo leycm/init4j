@@ -8,7 +8,7 @@ lombok = { id = "io.freefair.lombok", version = "8.14.2" }
 
 [libraries]
 annos-jetbrains = { group = "org.jetbrains", name = "annotations", version = "24.0.1" }
-annos-jspecify = { group = "org.jspecify", name = "jspecify", version = "1.0.0" }
+annos-jspecify = { group = "org.jspecify", name = "jspecify", version = "1.0" }
 
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = "2.2.10" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version = "2.2.10" }

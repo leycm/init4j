@@ -31,7 +31,7 @@ import java.util.function.Function;
  * <p>Thread Safety: Thread safety is delegated to {@link InstanceableRegistry},
 * which uses {@link ConcurrentHashMap} internally.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see InstanceableRegistry
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */

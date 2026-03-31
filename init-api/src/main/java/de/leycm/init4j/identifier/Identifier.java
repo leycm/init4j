@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * {@code final} and the instance state is fully initialized before the
  * constructor returns.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see Keyable
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */

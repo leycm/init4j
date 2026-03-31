@@ -15,7 +15,7 @@ import lombok.NonNull;
  * {@link Identifiable} objects, delegating equality to
  * {@link Identifier#equals(Object)}.</p>
  *
- * @since 1.0.0
+ * @since 1.0
  * @see Identifier
  * @author Lennard <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */

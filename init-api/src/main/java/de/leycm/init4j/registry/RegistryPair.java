@@ -18,7 +18,7 @@ import java.util.Map;
  * ensuring that the identifier matches the value's internal identity.</p>
  *
  * @param <T> the type of the value in this pair
- * @since 1.0.0
+ * @since 1.0
  * @author Lennard
  * <a href="mailto:leycm@proton.me">leycm@proton.me</a>
  */
