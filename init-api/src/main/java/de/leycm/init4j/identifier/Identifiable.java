@@ -7,7 +7,7 @@ import lombok.NonNull;
  *
  * <p>Implementing this interface signals that an object has a stable,
  * namespaced identity that can be used for lookup, comparison, or
- * registration purposes. The identity is exposed via {@link #identifier()}
+ * registration purposes. The identity is exposed via {@link #getIdentifier()}
  * and must remain consistent throughout the object's lifecycle.</p>
  *
  * <p>Two default utility methods are provided to simplify identity
