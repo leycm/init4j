@@ -1,8 +1,8 @@
-package de.leycm.init4j.registry;
+package de.leycm.std.registry;
 
-import de.leycm.init4j.identifier.Identifier;
-import de.leycm.init4j.registries.NoOverwriteRegistry;
-import de.leycm.init4j.registries.UnmodifiableRegistry;
+import de.leycm.std.identifier.Identifier;
+import de.leycm.std.registries.NoOverwriteRegistry;
+import de.leycm.std.registries.UnmodifiableRegistry;
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

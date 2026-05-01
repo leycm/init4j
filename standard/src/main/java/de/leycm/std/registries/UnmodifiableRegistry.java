@@ -1,9 +1,9 @@
-package de.leycm.init4j.registries;
+package de.leycm.std.registries;
 
-import de.leycm.init4j.identifier.Identifier;
-import de.leycm.init4j.registry.Registries;
-import de.leycm.init4j.registry.Registry;
-import de.leycm.init4j.registry.RegistryPair;
+import de.leycm.std.identifier.Identifier;
+import de.leycm.std.registry.Registries;
+import de.leycm.std.registry.Registry;
+import de.leycm.std.registry.RegistryPair;
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

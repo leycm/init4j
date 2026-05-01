@@ -8,13 +8,13 @@
  * Copyright (c) leycm <leycm@proton.me>
  * Copyright (c) maintainers
  */
-package de.leycm.init4j.instance;
+package de.leycm.std.instance;
 
-import de.leycm.init4j.identifier.Identifier;
-import de.leycm.init4j.registries.NoOverwriteRegistry;
-import de.leycm.init4j.registry.Registries;
-import de.leycm.init4j.registries.ConcurrentHashRegistry;
-import de.leycm.init4j.registry.Registry;
+import de.leycm.std.identifier.Identifier;
+import de.leycm.std.registries.NoOverwriteRegistry;
+import de.leycm.std.registry.Registries;
+import de.leycm.std.registries.ConcurrentHashRegistry;
+import de.leycm.std.registry.Registry;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.ApiStatus;

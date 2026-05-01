@@ -1,4 +1,4 @@
-package de.leycm.init4j.identifier;
+package de.leycm.std.identifier;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.Contract;

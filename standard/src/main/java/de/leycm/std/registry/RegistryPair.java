@@ -1,13 +1,13 @@
-package de.leycm.init4j.registry;
+package de.leycm.std.registry;
 
-import de.leycm.init4j.identifier.Identifiable;
-import de.leycm.init4j.identifier.Identifier;
+import de.leycm.std.identifier.Identifiable;
+import de.leycm.std.identifier.Identifier;
 import lombok.NonNull;
 
 import java.util.Map;
 
 /**
- * Represents a key-value pair in a {@link de.leycm.init4j.registry.Registry} where the key
+ * Represents a key-value pair in a {@link de.leycm.std.registry.Registry} where the key
  * is an {@link Identifier} and the value is of type {@code T}.
  *
  * <p>This interface provides access to the identifier and value independently of the underlying
@@ -29,7 +29,8 @@ public interface RegistryPair<T> {
      *
      * @return the non-null identifier
      */
-    @NonNull Identifier getIdentifier();
+    @NonNull
+    Identifier getIdentifier();
 
     /**
      * Returns the value associated with this pair.

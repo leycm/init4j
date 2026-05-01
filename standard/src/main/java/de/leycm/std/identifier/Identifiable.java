@@ -1,4 +1,4 @@
-package de.leycm.init4j.identifier;
+package de.leycm.std.identifier;
 
 import lombok.NonNull;
 
@@ -26,7 +26,8 @@ public interface Identifiable {
      *
      * @return the identifier; never {@code null}
      */
-    @NonNull Identifier getIdentifier();
+    @NonNull
+    Identifier getIdentifier();
 
     /**
      * Returns {@code true} if this object's identifier equals the given identifier.

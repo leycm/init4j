@@ -8,7 +8,7 @@
  * Copyright (c) leycm <leycm@proton.me>
  * Copyright (c) maintainers
  */
-package de.leycm.init4j.instance;
+package de.leycm.std.instance;
 
 import lombok.NonNull;
 
